@@ -1,5 +1,5 @@
 import type { PostFragment } from "@hey/indexer";
-import { memo } from "react";
+import { memo, useState } from "react";
 import PostWarning from "@/components/Shared/Post/PostWarning";
 import PostWrapper from "@/components/Shared/Post/PostWrapper";
 import { getBlockedByMeMessage } from "@/helpers/getBlockedMessage";
@@ -14,10 +14,17 @@ interface QuotedPostProps {
 }
 
 const QuotedPost = ({ isNew = false, post }: QuotedPostProps) => {
-  const isBlockededByMe = post.author.operations?.isBlockedByMe;
+  const isBlockedByMe = post.author.operations?.isBlockedByMe;
 
-  if (isBlockededByMe) {
-    return <PostWarning message={getBlockedByMeMessage(post.author)} />;
+  const [ignoreBlock, setIgnoreBlock] = useState(false);
+
+  if (isBlockedByMe && !ignoreBlock) {
+    return (
+      <PostWarning
+        message={getBlockedByMeMessage(post.author)}
+        setIgnoreBlock={setIgnoreBlock}
+      />
+    );
   }
 
   return (

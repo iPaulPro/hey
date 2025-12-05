@@ -2,6 +2,7 @@ import { QueueListIcon } from "@heroicons/react/24/outline";
 import { isRepost } from "@hey/helpers/postHelpers";
 import type { AnyPostFragment } from "@hey/indexer";
 import dayjs from "dayjs";
+import { useState } from "react";
 import PostWarning from "@/components/Shared/Post/PostWarning";
 import { Tooltip } from "@/components/Shared/UI";
 import cn from "@/helpers/cn";
@@ -24,15 +25,21 @@ const FullPost = ({ hasHiddenComments, post }: FullPostProps) => {
   const { setShowHiddenComments, showHiddenComments } =
     useHiddenCommentFeedStore();
 
+  const [ignoreBlock, setIgnoreBlock] = useState(false);
+
   const targetPost = isRepost(post) ? post?.repostOf : post;
   const { timestamp } = targetPost;
 
   const isBlockedByMe = post.author.operations?.isBlockedByMe;
 
-  if (isBlockedByMe) {
-    return <PostWarning message={getBlockedByMeMessage(post.author)} />;
+  if (isBlockedByMe && !ignoreBlock) {
+    return (
+      <PostWarning
+        message={getBlockedByMeMessage(post.author)}
+        setIgnoreBlock={setIgnoreBlock}
+      />
+    );
   }
-
   return (
     <article className="p-5">
       <PostType post={post} showType />
